@@ -75,4 +75,24 @@ describe "A class that is commentable" do
       end
     end
   end
+
+  describe 'deleting' do
+    before do
+      @user = User.create!
+      @commentable = Commentable.create!
+      @comment = Comment.create!(:user => @user, :commentable => @commentable, :body => 'sup')
+      @child_comment = Comment.create!(:user => @user, :commentable => @commentable, :body => 'sup', :parent_id => @comment.id)
+      @other_comment = Comment.create!(:user => @user, :commentable => @commentable, :body => 'sup')
+
+      @commentable.destroy
+    end
+
+    it 'should destroy as item as linked comments' do
+      @commentable.should be_destroyed
+      Comment.should_not be_exists @comment
+      Comment.should_not be_exists @other_comment
+      Comment.should_not be_exists @child_comment
+      Comment.should_not be_exists @grandchild_comment
+    end
+  end
 end
