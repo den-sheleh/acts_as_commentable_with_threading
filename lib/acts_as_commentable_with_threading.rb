@@ -16,7 +16,9 @@ module Acts #:nodoc:
 
   module ClassMethods
     def acts_as_commentable
-      has_many :comment_threads, :class_name => "Comment", :as => :commentable, :dependent => :destroy
+      has_many :comment_threads, :class_name => "Comment", :as => :commentable
+      has_many :root_comments, :class_name => "Comment", :as => :commentable,
+                               :conditions => ['parent_id IS NULL'], :dependent => :destroy
       include Acts::CommentableWithThreading::LocalInstanceMethods
       extend Acts::CommentableWithThreading::SingletonMethods
     end
@@ -40,11 +42,6 @@ module Acts #:nodoc:
   end
 
   module LocalInstanceMethods
-
-    # Helper method to display only root threads, no children/replies
-    def root_comments
-      self.comment_threads.where(:parent_id => nil)
-    end
 
     # Helper method to sort comments by date
     def comments_ordered_by_submitted
